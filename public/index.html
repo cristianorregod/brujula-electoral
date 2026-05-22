@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brújula Electoral · Colombia 2026</title>
-<link rel="icon" href="public/favicon.ico" type="image/x-icon">
-<link rel="shortcut icon" href="public/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -1616,6 +1616,50 @@
 </div>
 
 <script>
+  const STORAGE_KEY = 'brujula_session_id';
+
+  function generateSessionId() {
+    if (window.crypto?.randomUUID) {
+      return window.crypto.randomUUID();
+    }
+    return 'session-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+  }
+
+  function getSessionId() {
+    try {
+      let sessionId = localStorage.getItem(STORAGE_KEY);
+      if (!sessionId) {
+        sessionId = generateSessionId();
+        localStorage.setItem(STORAGE_KEY, sessionId);
+      }
+      return sessionId;
+    } catch (error) {
+      console.warn('No se pudo leer localStorage para la sesión:', error);
+      return generateSessionId();
+    }
+  }
+
+  async function submitCandidatoResult(candidate, payload = {}) {
+    const sessionId = getSessionId();
+    try {
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, candidate, payload })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        console.warn('Error al enviar resultado a la API:', response.status, errorData);
+      } else {
+        const data = await response.json();
+        console.log('Resultado enviado:', data);
+      }
+    } catch (error) {
+      console.warn('Fallo al conectar con /api/submit:', error);
+    }
+  }
+
   // === Configuración de ejes y candidatos ===
   const EJES = ["economico", "seguridad", "ambiental", "paz", "reformas"];
 
@@ -2061,6 +2105,12 @@
     const sorted = Object.entries(afinPct).sort((a, b) => b[1] - a[1]);
     const ganador = sorted[0][0];
     const c = CANDIDATOS[ganador];
+
+    submitCandidatoResult(ganador, {
+      affinities: Object.entries(afinPct).map(([key, value]) => ({ candidate: key, pct: value })),
+      positions: posNormalizada,
+      resultAt: new Date().toISOString()
+    });
 
     document.getElementById("tc-result-name").textContent = c.nombre;
     document.getElementById("tc-result-tagline").textContent = c.tagline;

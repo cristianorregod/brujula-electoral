@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  last_seen TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS votes (
+  id TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  candidate TEXT NOT NULL,
+  payload TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (session_id) REFERENCES sessions(id)
+);
