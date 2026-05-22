@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brújula Electoral · Colombia 2026</title>
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
-<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -1616,50 +1614,6 @@
 </div>
 
 <script>
-  const STORAGE_KEY = 'brujula_session_id';
-
-  function generateSessionId() {
-    if (window.crypto?.randomUUID) {
-      return window.crypto.randomUUID();
-    }
-    return 'session-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-  }
-
-  function getSessionId() {
-    try {
-      let sessionId = localStorage.getItem(STORAGE_KEY);
-      if (!sessionId) {
-        sessionId = generateSessionId();
-        localStorage.setItem(STORAGE_KEY, sessionId);
-      }
-      return sessionId;
-    } catch (error) {
-      console.warn('No se pudo leer localStorage para la sesión:', error);
-      return generateSessionId();
-    }
-  }
-
-  async function submitCandidatoResult(candidate, payload = {}) {
-    const sessionId = getSessionId();
-    try {
-      const response = await fetch('/api/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId, candidate, payload })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        console.warn('Error al enviar resultado a la API:', response.status, errorData);
-      } else {
-        const data = await response.json();
-        console.log('Resultado enviado:', data);
-      }
-    } catch (error) {
-      console.warn('Fallo al conectar con /api/submit:', error);
-    }
-  }
-
   // === Configuración de ejes y candidatos ===
   const EJES = ["economico", "seguridad", "ambiental", "paz", "reformas"];
 
@@ -1680,7 +1634,7 @@
       nombreCorto: "Abelardo",
       tagline: "Defensores de la Patria · Mano firme y reducción del Estado",
       desc: "Propone una agenda de seguridad de confrontación directa contra el crimen organizado, reducción significativa del tamaño del Estado, libre mercado con menos impuestos y regulación, y defensa de las instituciones tradicionales como núcleo del orden social.",
-      pos: { economico: 9, seguridad: 9, ambiental: 5, paz: -9, reformas: 9 },
+      pos: { economico: 9, seguridad: 9, ambiental: 5, paz: 9, reformas: 9 },
       color: "var(--abelardo)",
       colorHex: "#c2410c",
       bg: "var(--abelardo-bg)"
@@ -1690,7 +1644,7 @@
       nombreCorto: "Paloma",
       tagline: "Colombia Más Grande · Reforma gerencial con tecnología",
       desc: "Propone modernizar el Estado con tecnología, recuperar la confianza inversionista, reducir el déficit fiscal con disciplina, fortalecer la Fuerza Pública con un Plan 30-30 y combinar inversión pública con incentivos al sector privado.",
-      pos: { economico: 6, seguridad: 6, ambiental: 8, paz: -4, reformas: 4 },
+      pos: { economico: 6, seguridad: 6, ambiental: 8, paz: 4, reformas: 4 },
       color: "var(--paloma)",
       colorHex: "#1d4ed8",
       bg: "var(--paloma-bg)"
@@ -1700,7 +1654,7 @@
       nombreCorto: "Cepeda",
       tagline: "El Poder de la Verdad · Continuidad y profundización del cambio",
       desc: "Propone una segunda fase del gobierno Petro centrada en revolución agraria, seguridad humana basada en política social, implementación plena del Acuerdo de Paz de 2016, transición energética sin fracking y una política contra la macrocorrupción como sistema.",
-      pos: { economico: -8, seguridad: -8, ambiental: -9, paz: 9, reformas: -9 },
+      pos: { economico: -8, seguridad: -8, ambiental: -9, paz: -9, reformas: -9 },
       color: "var(--cepeda)",
       colorHex: "#047857",
       bg: "var(--cepeda-bg)"
@@ -1749,15 +1703,15 @@
       texto: "La protección de los bosques y los ríos debe estar por encima del beneficio económico de proyectos mineros o energéticos." },
 
     // === BLOQUE 4: Paz ===
-    { id: "q16", tipo: "likert", bloque: "paz", eje: "paz", direction: -1, intensity: 2,
+    { id: "q16", tipo: "likert", bloque: "paz", eje: "paz", direction: +1, intensity: 2,
       texto: "Con los grupos armados ilegales no se negocia: se les derrota militarmente." },
-    { id: "q17", tipo: "likert", bloque: "paz", eje: "paz", direction: -1, intensity: 1,
+    { id: "q17", tipo: "likert", bloque: "paz", eje: "paz", direction: +1, intensity: 1,
       texto: "La política de Paz Total del gobierno actual ha sido un error." },
-    { id: "q18", tipo: "likert", bloque: "paz", eje: "paz", direction: +1, intensity: 2,
+    { id: "q18", tipo: "likert", bloque: "paz", eje: "paz", direction: -1, intensity: 2,
       texto: "El Acuerdo de Paz de 2016 debe implementarse en su totalidad, incluso si toma cuatro años más de lo previsto." },
-    { id: "q19", tipo: "likert", bloque: "paz", eje: "paz", direction: +1, intensity: 1,
+    { id: "q19", tipo: "likert", bloque: "paz", eje: "paz", direction: -1, intensity: 1,
       texto: "Los líderes sociales y firmantes de paz asesinados son consecuencia de fallas del Estado que deben repararse urgentemente." },
-    { id: "q20", tipo: "likert", bloque: "paz", eje: "paz", direction: +1, intensity: 1,
+    { id: "q20", tipo: "likert", bloque: "paz", eje: "paz", direction: -1, intensity: 1,
       texto: "Los exguerrilleros que cumplieron con la justicia transicional tienen derecho a hacer política y ocupar cargos públicos." },
 
     // === BLOQUE 5: Reformas ===
@@ -1785,19 +1739,19 @@
     { id: "q27", tipo: "choice", bloque: "prioridades",
       texto: "¿Cuál de estos cuatro problemas debería ser la prioridad #1 del próximo gobierno?",
       opciones: [
-        { texto: "Recuperar el orden público y derrotar al crimen organizado", impacto: { seguridad: +2, paz: -2 } },
+        { texto: "Recuperar el orden público y derrotar al crimen organizado", impacto: { seguridad: +2, paz: +2 } },
         { texto: "Estabilizar la economía y atraer inversión", impacto: { economico: +2, reformas: +1 } },
         { texto: "Reducir la pobreza y la desigualdad", impacto: { economico: -2, seguridad: -1 } },
-        { texto: "Implementar la paz y proteger líderes sociales", impacto: { paz: +2, reformas: -1 } }
+        { texto: "Implementar la paz y proteger líderes sociales", impacto: { paz: -2, reformas: -1 } }
       ]
     },
     { id: "q28", tipo: "choice", bloque: "prioridades",
       texto: "Si tuvieras que escoger una sola palabra que describe lo que Colombia más necesita ahora mismo:",
       opciones: [
-        { texto: "Orden", impacto: { seguridad: +2, paz: -1, reformas: +1 } },
+        { texto: "Orden", impacto: { seguridad: +2, paz: +1, reformas: +1 } },
         { texto: "Eficiencia", impacto: { economico: +1, reformas: +1 } },
         { texto: "Justicia", impacto: { economico: -2, reformas: -1 } },
-        { texto: "Reconciliación", impacto: { paz: +2, reformas: -1 } }
+        { texto: "Reconciliación", impacto: { paz: -2, reformas: -1 } }
       ]
     },
 
@@ -1812,8 +1766,8 @@
     { id: "q30", tipo: "tradeoff", bloque: "tradeoffs",
       texto: "En un caso real donde la fuerza pública tuviera que escoger:",
       opciones: [
-        { texto: "Capturar a un narcotraficante importante, incluso si eso causa daños colaterales en la comunidad", impacto: { seguridad: +3, paz: -2 } },
-        { texto: "Proteger a la comunidad, incluso si eso significa que el narcotraficante escape esta vez", impacto: { seguridad: -3, paz: +2 } }
+        { texto: "Capturar a un narcotraficante importante, incluso si eso causa daños colaterales en la comunidad", impacto: { seguridad: +3, paz: +2 } },
+        { texto: "Proteger a la comunidad, incluso si eso significa que el narcotraficante escape esta vez", impacto: { seguridad: -3, paz: -2 } }
       ]
     }
   ];
@@ -2105,12 +2059,6 @@
     const sorted = Object.entries(afinPct).sort((a, b) => b[1] - a[1]);
     const ganador = sorted[0][0];
     const c = CANDIDATOS[ganador];
-
-    submitCandidatoResult(ganador, {
-      affinities: Object.entries(afinPct).map(([key, value]) => ({ candidate: key, pct: value })),
-      positions: posNormalizada,
-      resultAt: new Date().toISOString()
-    });
 
     document.getElementById("tc-result-name").textContent = c.nombre;
     document.getElementById("tc-result-tagline").textContent = c.tagline;
