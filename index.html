@@ -1,0 +1,2269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brújula Electoral · Colombia 2026</title>
+<link rel="icon" href="public/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="public/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --co-yellow: #fcd116;
+    --co-yellow-soft: #fef3c7;
+    --co-blue: #003893;
+    --co-blue-soft: #dbeafe;
+    --co-red: #ce1126;
+    --co-red-soft: #fee2e2;
+
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --surface-2: #f5f5f4;
+    --surface-3: #e7e5e4;
+    --border: #e7e5e4;
+    --border-strong: #d6d3d1;
+    --ink: #0c0a09;
+    --ink-2: #44403c;
+    --ink-3: #78716c;
+    --ink-4: #a8a29e;
+
+    --abelardo: #c2410c;
+    --abelardo-bg: #ffedd5;
+
+    --paloma: #1d4ed8;
+    --paloma-bg: #dbeafe;
+
+    --cepeda: #047857;
+    --cepeda-bg: #d1fae5;
+
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 18px;
+
+    --shadow-sm: 0 1px 2px rgba(12, 10, 9, 0.04);
+    --shadow: 0 1px 3px rgba(12, 10, 9, 0.05), 0 1px 2px rgba(12, 10, 9, 0.04);
+    --shadow-lg: 0 10px 30px -8px rgba(12, 10, 9, 0.12), 0 4px 12px -4px rgba(12, 10, 9, 0.06);
+
+    --t-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --t: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  body {
+    min-height: 100vh;
+    padding: 0;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* === Decoración electoral colombiana === */
+  .flag-strip {
+    height: 6px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    width: 100%;
+  }
+  .flag-strip > div:nth-child(1) { background: var(--co-yellow); }
+  .flag-strip > div:nth-child(2) { background: var(--co-blue); }
+  .flag-strip > div:nth-child(3) { background: var(--co-red); }
+
+  .deco-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .deco-shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.4;
+  }
+
+  .deco-1 {
+    width: 400px; height: 400px;
+    background: var(--co-yellow);
+    top: -100px; left: -100px;
+    opacity: 0.25;
+  }
+  .deco-2 {
+    width: 300px; height: 300px;
+    background: var(--co-blue);
+    top: 30%; right: -80px;
+    opacity: 0.12;
+  }
+  .deco-3 {
+    width: 350px; height: 350px;
+    background: var(--co-red);
+    bottom: -100px; left: 20%;
+    opacity: 0.12;
+  }
+
+  .header-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.85);
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, var(--co-yellow) 50%, var(--co-blue) 50%, var(--co-blue) 75%, var(--co-red) 75%);
+    border: 1px solid var(--border);
+  }
+
+  .header-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .header-meta {
+    font-size: 12px;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .header-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--co-red);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+
+  .screen { animation: fadeIn 400ms cubic-bezier(0.4, 0, 0.2, 1); }
+  .hidden { display: none !important; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px 44px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+
+  .card-accent::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--co-yellow) 0%, var(--co-yellow) 50%, var(--co-blue) 50%, var(--co-blue) 75%, var(--co-red) 75%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 18px;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 24px;
+    height: 1px;
+    background: var(--ink-3);
+  }
+
+  h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--co-blue);
+  }
+
+  .lead {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-2);
+    margin-bottom: 28px;
+  }
+
+  /* === Intro features con estilo electoral === */
+  .intro-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 32px 0;
+    padding: 20px;
+    background: var(--surface-2);
+    border-radius: var(--radius);
+  }
+
+  .meta-item {
+    text-align: center;
+    padding: 6px 4px;
+  }
+
+  .meta-item + .meta-item {
+    border-left: 1px solid var(--border);
+  }
+
+  .meta-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 26px;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .meta-label {
+    font-size: 11px;
+    color: var(--ink-3);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* === Ejes visualization en intro === */
+  .ejes-preview {
+    margin: 28px 0;
+    padding: 24px;
+    background: var(--surface-2);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--co-yellow);
+  }
+
+  .ejes-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+  }
+
+  .eje-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 14px;
+  }
+
+  .eje-row + .eje-row { border-top: 1px solid var(--border); }
+
+  .eje-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .eje-name {
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .eje-desc {
+    color: var(--ink-3);
+    font-size: 12px;
+  }
+
+  .disclaimer {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--co-yellow-soft);
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 28px;
+    font-size: 13px;
+    color: #78350f;
+    line-height: 1.5;
+  }
+
+  .disclaimer svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* === Buttons === */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--ink);
+    color: var(--surface);
+    border: none;
+    padding: 14px 22px;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--t-fast);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn:hover:not(:disabled) {
+    background: var(--ink-2);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
+
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-2);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+    transform: none;
+  }
+
+  .btn-lg { padding: 16px 28px; font-size: 16px; }
+
+  /* === Progress === */
+  .progress-wrap { margin-bottom: 24px; }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .progress-counter {
+    color: var(--ink-3);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .progress-block-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink);
+    font-weight: 500;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .progress-block-tag .block-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    display: flex;
+  }
+
+  .progress-segment {
+    height: 100%;
+    transition: opacity var(--t);
+    margin-right: 2px;
+    opacity: 0.25;
+  }
+
+  .progress-segment:last-child { margin-right: 0; }
+  .progress-segment.done { opacity: 1; }
+  .progress-segment.current { opacity: 0.6; }
+
+  /* === Question screen === */
+  .question {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+
+  .question-hint {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+
+  /* === Likert scale === */
+  .likert {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .likert-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: all var(--t-fast);
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+
+  .likert-option:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+    color: var(--ink);
+    transform: translateX(2px);
+  }
+
+  .likert-option.selected {
+    background: var(--ink);
+    color: var(--surface);
+    border-color: var(--ink);
+    transform: translateX(2px);
+  }
+
+  .likert-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--ink-4);
+    flex-shrink: 0;
+    transition: all var(--t-fast);
+    position: relative;
+  }
+
+  .likert-option:hover .likert-dot { border-color: var(--ink-2); }
+
+  .likert-option.selected .likert-dot {
+    background: var(--surface);
+    border-color: var(--surface);
+  }
+
+  .likert-option.selected .likert-dot::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+
+  /* Likert dots vary in size by intensity */
+  .likert-option[data-val="-2"] .likert-dot { width: 28px; height: 28px; }
+  .likert-option[data-val="-1"] .likert-dot { width: 24px; height: 24px; }
+  .likert-option[data-val="0"] .likert-dot { width: 18px; height: 18px; }
+  .likert-option[data-val="1"] .likert-dot { width: 24px; height: 24px; }
+  .likert-option[data-val="2"] .likert-dot { width: 28px; height: 28px; }
+
+  .likert-label {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .likert-intensity {
+    font-size: 11px;
+    color: var(--ink-4);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .likert-option.selected .likert-intensity { color: rgba(255,255,255,0.6); }
+
+  /* === Multi-choice (priorities) === */
+  .choices {
+    display: grid;
+    gap: 10px;
+  }
+
+  .choice {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all var(--t-fast);
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  .choice:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+    color: var(--ink);
+    transform: translateX(2px);
+  }
+
+  .choice.selected {
+    background: var(--ink);
+    color: var(--surface);
+    border-color: var(--ink);
+    transform: translateX(2px);
+  }
+
+  /* === Trade-offs === */
+  .tradeoff {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .tradeoff-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    cursor: pointer;
+    transition: all var(--t-fast);
+    text-align: center;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.55;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 140px;
+  }
+
+  .tradeoff-card:hover {
+    border-color: var(--ink-2);
+    background: var(--surface-2);
+    transform: translateY(-2px);
+  }
+
+  .tradeoff-card.selected {
+    border-color: var(--ink);
+    background: var(--surface-2);
+    box-shadow: var(--shadow);
+  }
+
+  .tradeoff-card .tradeoff-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--ink-4);
+    margin: 0 auto 12px;
+    transition: all var(--t-fast);
+    position: relative;
+  }
+
+  .tradeoff-card.selected .tradeoff-check {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .tradeoff-card.selected .tradeoff-check::after {
+    content: "✓";
+    color: var(--surface);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .tradeoff-vs {
+    align-self: center;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 24px;
+    color: var(--ink-4);
+  }
+
+  /* === Nav === */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    gap: 12px;
+  }
+
+  /* === Transition screen === */
+  .transition-card {
+    text-align: center;
+    padding: 60px 40px;
+  }
+
+  .transition-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: var(--surface-2);
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+  }
+
+  .transition-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 14px;
+    color: var(--ink-3);
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+
+  .transition-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 36px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .transition-desc {
+    font-size: 15px;
+    color: var(--ink-3);
+    margin-bottom: 28px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  /* === Result === */
+  .result-hero {
+    text-align: center;
+    padding: 20px 0 32px;
+    position: relative;
+  }
+
+  .result-confetti {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 60px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .result-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--co-yellow-soft);
+    color: #78350f;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+    border: 1px solid #fde68a;
+  }
+
+  .result-name {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin-bottom: 8px;
+  }
+
+  .result-tagline {
+    font-size: 15px;
+    color: var(--ink-3);
+    margin-bottom: 24px;
+  }
+
+  .result-desc {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink-2);
+    max-width: 540px;
+    margin: 0 auto 16px;
+  }
+
+  .result-reason {
+    background: var(--surface-2);
+    border-left: 3px solid var(--co-yellow);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 14px 18px;
+    margin: 16px auto 0;
+    max-width: 540px;
+    text-align: left;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  .result-reason strong { color: var(--ink); font-weight: 600; }
+
+  /* === Bars === */
+  .bars-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 32px 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bar {
+    margin-bottom: 18px;
+  }
+
+  .bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .bar-name { font-weight: 500; color: var(--ink); }
+  .bar-value { color: var(--ink-3); font-variant-numeric: tabular-nums; font-size: 13px; }
+
+  .bar-track {
+    height: 8px;
+    background: var(--surface-2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* === Compass chart === */
+  .compass-section {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .compass-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 130px;
+    gap: 12px;
+    align-items: center;
+    margin: 14px 0;
+    font-size: 12px;
+  }
+
+  .compass-label-l { text-align: right; color: var(--ink-3); }
+  .compass-label-r { text-align: left; color: var(--ink-3); }
+
+  .compass-track {
+    position: relative;
+    height: 8px;
+    background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-2) 50%, var(--surface-2) 100%);
+    border-radius: 4px;
+  }
+
+  .compass-track::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -4px;
+    bottom: -4px;
+    width: 1px;
+    background: var(--border-strong);
+  }
+
+  .compass-user {
+    position: absolute;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    background: var(--ink);
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: left 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 3;
+    box-shadow: 0 0 0 1px var(--ink);
+  }
+
+  .compass-cand {
+    position: absolute;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: left 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .compass-cand-a { background: var(--abelardo); }
+  .compass-cand-p { background: var(--paloma); }
+  .compass-cand-c { background: var(--cepeda); }
+
+  .compass-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .compass-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-3);
+  }
+
+  .compass-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .compass-legend-dot.user {
+    background: var(--ink);
+    border: 2px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--ink);
+  }
+
+  /* === Recap === */
+  .recap-intro {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .recap-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
+  }
+
+  .recap-subtitle {
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .recap-block {
+    margin-bottom: 28px;
+  }
+
+  .recap-block-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .recap-block-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-2);
+  }
+
+  .recap-block-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .recap-item {
+    padding: 10px 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .recap-item + .recap-item { border-top: 1px solid var(--border); }
+
+  .recap-q {
+    color: var(--ink-2);
+    margin-bottom: 4px;
+  }
+
+  .recap-a {
+    color: var(--ink-3);
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .recap-a-label {
+    font-style: italic;
+  }
+
+  .recap-a-intensity {
+    background: var(--surface-2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+
+  /* === Footer === */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 12px;
+    color: var(--ink-3);
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  .footer-flag {
+    display: inline-block;
+    width: 16px;
+    height: 11px;
+    margin-right: 4px;
+    vertical-align: middle;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--co-yellow) 0%, var(--co-yellow) 50%, var(--co-blue) 50%, var(--co-blue) 75%, var(--co-red) 75%, var(--co-red) 100%);
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 20px 14px 60px; }
+    .card { padding: 28px 22px; }
+    h1 { font-size: 34px; }
+    .result-name { font-size: 36px; }
+    .question { font-size: 22px; }
+    .intro-meta { grid-template-columns: repeat(2, 1fr); }
+    .meta-item + .meta-item { border-left: none; }
+    .meta-item:nth-child(3), .meta-item:nth-child(4) { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 6px; }
+    .tradeoff { grid-template-columns: 1fr; }
+    .tradeoff-vs { padding: 4px 0; }
+    .compass-row { grid-template-columns: 90px 1fr 90px; font-size: 11px; gap: 8px; }
+    .transition-title { font-size: 28px; }
+    .header-title { font-size: 15px; }
+    .recap-nav { flex-direction: column; align-items: stretch; gap: 10px; }
+    .recap-nav-right { display: flex; gap: 10px; }
+    .recap-nav-right .btn { flex: 1; }
+  }
+
+  /* === Recap nav layout === */
+  .recap-nav-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  /* === Sección de planes oficiales === */
+  .plans-section {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .plans-intro {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .plans-list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .plan-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--ink-2);
+    transition: all var(--t-fast);
+    font-family: inherit;
+  }
+
+  .plan-link:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-2);
+    color: var(--ink);
+    transform: translateX(2px);
+  }
+
+  .plan-link-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .plan-link-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .plan-link-cta {
+    font-size: 12px;
+    color: var(--ink-3);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-style: italic;
+  }
+
+  .plan-link:hover .plan-link-cta {
+    color: var(--ink);
+  }
+
+  /* === Print styles para exportar a PDF === */
+  @media print {
+    @page {
+      size: A4;
+      margin: 1.5cm 1.8cm;
+    }
+
+    /* Reset general para impresión */
+    body {
+      background: #ffffff !important;
+      padding: 0 !important;
+      color: #000;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Ocultar todo lo que no es el recap */
+    .deco-bg,
+    .flag-strip,
+    .header-bar,
+    .footer,
+    #screen-intro,
+    #screen-transition,
+    #screen-quiz,
+    #screen-result,
+    .nav,
+    .recap-nav {
+      display: none !important;
+    }
+
+    /* Mostrar el screen-recap aunque tenga clase hidden */
+    #screen-recap,
+    #screen-recap.hidden {
+      display: block !important;
+    }
+
+    .container {
+      max-width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    .card {
+      box-shadow: none !important;
+      border: none !important;
+      padding: 0 !important;
+      background: #ffffff !important;
+    }
+
+    .card-accent::before { display: none; }
+
+    /* Header impreso (se inyecta dinámicamente) */
+    .print-header {
+      display: block !important;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #000;
+    }
+
+    .print-header-flag {
+      display: inline-block;
+      width: 28px;
+      height: 18px;
+      vertical-align: middle;
+      margin-right: 8px;
+      background: linear-gradient(180deg, #fcd116 0%, #fcd116 50%, #003893 50%, #003893 75%, #ce1126 75%, #ce1126 100%);
+      border: 1px solid #000;
+    }
+
+    .print-header-title {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 22px;
+      font-weight: normal;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .print-header-meta {
+      font-size: 11px;
+      color: #555;
+      margin-top: 6px;
+    }
+
+    .print-result-summary {
+      display: block !important;
+      background: #fafaf9 !important;
+      border: 1px solid #d6d3d1 !important;
+      border-left: 4px solid #fcd116 !important;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      page-break-inside: avoid;
+    }
+
+    .print-result-summary h2 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 24px;
+      font-weight: normal;
+      margin-bottom: 4px;
+    }
+
+    .print-result-summary .print-tagline {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+
+    .print-result-summary .print-affinities {
+      display: block;
+      font-size: 12px;
+    }
+
+    .print-result-summary .print-affinity-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dotted #d6d3d1;
+    }
+
+    .print-result-summary .print-affinity-row:last-child { border-bottom: none; }
+
+    /* Hide details summary in print, show all citations expanded */
+    details summary { display: none !important; }
+    details { display: block !important; }
+    details > * { display: block !important; }
+
+    /* Recap intro and content */
+    .recap-intro {
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+    }
+
+    .recap-title {
+      font-size: 20px;
+      color: #000;
+    }
+
+    .recap-subtitle { font-size: 11px; color: #555; }
+
+    .eyebrow { color: #555 !important; }
+
+    .recap-block {
+      page-break-inside: avoid;
+      margin-bottom: 20px;
+    }
+
+    .recap-block-header {
+      background: #fafaf9 !important;
+      padding: 8px 10px;
+      border: 1px solid #d6d3d1;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .recap-block-title {
+      font-size: 12px !important;
+      color: #000 !important;
+    }
+
+    .recap-item {
+      page-break-inside: avoid;
+      padding: 8px 0;
+      font-size: 12px;
+    }
+
+    .recap-q { color: #000 !important; font-size: 12px; }
+    .recap-a { font-size: 11px; color: #444 !important; }
+    .recap-a-intensity {
+      background: #f5f5f4 !important;
+      border: 1px solid #d6d3d1;
+    }
+
+    /* Footer impreso */
+    .print-footer {
+      display: block !important;
+      margin-top: 30px;
+      padding-top: 12px;
+      border-top: 1px solid #d6d3d1;
+      font-size: 10px;
+      color: #888;
+      text-align: center;
+    }
+
+    /* No display by default; only in print */
+    .print-only { display: none; }
+  }
+
+  @media print {
+    .print-only { display: block !important; }
+  }
+
+  @media (max-width: 600px) {
+</style>
+</head>
+<body>
+
+<div class="deco-bg">
+  <div class="deco-shape deco-1"></div>
+  <div class="deco-shape deco-2"></div>
+  <div class="deco-shape deco-3"></div>
+</div>
+
+<div class="flag-strip">
+  <div></div><div></div><div></div>
+</div>
+
+<header class="header-bar">
+  <div class="header-brand">
+    <div class="header-logo"></div>
+    <div class="header-title">Brújula Electoral</div>
+  </div>
+  <div class="header-meta">
+    <span class="header-dot"></span>
+    Elecciones Colombia 2026
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- === INTRO === -->
+  <div id="screen-intro" class="screen">
+    <div class="card card-accent">
+      <div class="eyebrow">Test de afinidad política</div>
+      <h1>¿Dónde estás en el <em>espectro político</em> colombiano?</h1>
+      <p class="lead">Un test de 30 preguntas que mide tu posición en cinco ejes ideológicos y la compara con la de tres candidatos presidenciales. Basado en los planes de gobierno oficiales.</p>
+
+      <div class="intro-meta">
+        <div class="meta-item">
+          <div class="meta-num">30</div>
+          <div class="meta-label">preguntas</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-num">5</div>
+          <div class="meta-label">ejes</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-num">3</div>
+          <div class="meta-label">candidatos</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-num">~15</div>
+          <div class="meta-label">minutos</div>
+        </div>
+      </div>
+
+      <div class="ejes-preview">
+        <div class="ejes-title">Los cinco ejes que vas a explorar</div>
+        <div class="eje-row">
+          <div class="eje-icon">💰</div>
+          <div class="eje-name">Económico</div>
+          <div class="eje-desc">Estado activo ↔ Mercado libre</div>
+        </div>
+        <div class="eje-row">
+          <div class="eje-icon">🛡️</div>
+          <div class="eje-name">Seguridad</div>
+          <div class="eje-desc">Política social ↔ Mano dura</div>
+        </div>
+        <div class="eje-row">
+          <div class="eje-icon">🌱</div>
+          <div class="eje-name">Ambiental</div>
+          <div class="eje-desc">Transición ↔ Extractivismo</div>
+        </div>
+        <div class="eje-row">
+          <div class="eje-icon">🕊️</div>
+          <div class="eje-name">Paz</div>
+          <div class="eje-desc">Negociación ↔ Confrontación</div>
+        </div>
+        <div class="eje-row">
+          <div class="eje-icon">🔄</div>
+          <div class="eje-name">Reformas</div>
+          <div class="eje-desc">Continuidad ↔ Ruptura</div>
+        </div>
+      </div>
+
+      <p style="font-size: 14px; line-height: 1.7; color: var(--ink-2); margin-bottom: 14px;">Vas a responder afirmaciones en escala de 5 puntos: desde "muy en desacuerdo" hasta "muy de acuerdo". Cada respuesta te ubica un poco más en uno de los cinco ejes. Al final verás tu posición y la distancia que te separa de cada candidato.</p>
+
+      <p style="font-size: 14px; line-height: 1.7; color: var(--ink-2); margin-bottom: 24px;">Las afirmaciones están redactadas en lenguaje neutro, sin mencionar partidos ni candidatos. Tú no sabes qué propuesta corresponde a quién hasta el final.</p>
+
+      <div class="disclaimer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>Este es un ejercicio educativo, no una recomendación de voto. La metodología completa y las fuentes están al final del test.</span>
+      </div>
+
+      <button class="btn btn-lg" onclick="tcStart()">
+        Empezar el test
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- === TRANSITION === -->
+  <div id="screen-transition" class="screen hidden">
+    <div class="card card-accent transition-card">
+      <div class="transition-icon" id="tr-icon">💰</div>
+      <div class="transition-num" id="tr-num">BLOQUE 1 DE 7</div>
+      <div class="transition-title" id="tr-title">Eje económico</div>
+      <div class="transition-desc" id="tr-desc">Vamos a medir tu posición sobre el papel del Estado en la economía. Cinco preguntas en escala de 5 puntos.</div>
+      <button class="btn btn-lg" onclick="tcContinueFromTransition()">
+        Continuar
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- === QUIZ === -->
+  <div id="screen-quiz" class="screen hidden">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span class="progress-counter" id="tc-counter">Pregunta 1 de 30</span>
+        <span class="progress-block-tag" id="tc-block-tag">
+          <span class="block-dot"></span>
+          <span id="tc-block-name">Económico</span>
+        </span>
+      </div>
+      <div class="progress-bar" id="tc-progress-bar"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="question" id="tc-question"></h2>
+      <p class="question-hint" id="tc-hint"></p>
+      <div id="tc-options"></div>
+      <div class="nav">
+        <button class="btn btn-ghost" id="tc-back" onclick="tcBack()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Anterior
+        </button>
+        <button class="btn" id="tc-next" onclick="tcNext()" disabled>
+          Siguiente
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === RESULT === -->
+  <div id="screen-result" class="screen hidden">
+    <div class="card card-accent">
+      <div class="result-hero">
+        <svg class="result-confetti" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="30" r="3" fill="#fcd116"/>
+          <circle cx="50" cy="15" r="2.5" fill="#003893"/>
+          <circle cx="80" cy="40" r="3" fill="#ce1126"/>
+          <circle cx="120" cy="20" r="2.5" fill="#fcd116"/>
+          <circle cx="150" cy="35" r="3" fill="#003893"/>
+          <circle cx="180" cy="18" r="2.5" fill="#ce1126"/>
+          <rect x="35" y="45" width="3" height="3" fill="#fcd116" transform="rotate(15 36 46)"/>
+          <rect x="100" y="50" width="3" height="3" fill="#003893" transform="rotate(-25 101 51)"/>
+          <rect x="165" y="48" width="3" height="3" fill="#ce1126" transform="rotate(40 166 49)"/>
+        </svg>
+        <div class="result-tag" id="tc-result-tag">
+          <span>🎯</span>
+          <span>Tu candidato afín</span>
+        </div>
+        <h2 class="result-name" id="tc-result-name"></h2>
+        <p class="result-tagline" id="tc-result-tagline"></p>
+        <p class="result-desc" id="tc-result-desc"></p>
+        <div class="result-reason" id="tc-result-reason"></div>
+      </div>
+
+      <div class="bars-title">Tu afinidad por candidato</div>
+      <div id="tc-result-bars"></div>
+
+      <div class="compass-section">
+        <div class="bars-title" style="margin-top: 0;">Tu posición en cada eje</div>
+        <div id="tc-compass"></div>
+        <div class="compass-legend">
+          <div class="compass-legend-item"><span class="compass-legend-dot user"></span>Tú</div>
+          <div class="compass-legend-item"><span class="compass-legend-dot" style="background: var(--abelardo);"></span>Abelardo</div>
+          <div class="compass-legend-item"><span class="compass-legend-dot" style="background: var(--paloma);"></span>Paloma</div>
+          <div class="compass-legend-item"><span class="compass-legend-dot" style="background: var(--cepeda);"></span>Cepeda</div>
+        </div>
+      </div>
+
+      <div class="plans-section">
+        <div class="bars-title" style="margin-top: 0;">Profundiza en los planes oficiales</div>
+        <p class="plans-intro">Si quieres ir más allá del test, lee los planes de gobierno completos de los tres candidatos en su versión original.</p>
+        <div class="plans-list">
+          <a class="plan-link" href="https://drive.google.com/file/d/1ZQ0z41Cp2Jo-Qto_y1JvIAr-6Enco0vT/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <span class="plan-link-dot" style="background: var(--abelardo);"></span>
+            <span class="plan-link-name">Abelardo De La Espriella</span>
+            <span class="plan-link-cta">
+              Leer el plan
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </span>
+          </a>
+          <a class="plan-link" href="https://drive.google.com/file/d/1xy-nQ0DCwVXGH7xvjuFw1M9Mc-ox-E40/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <span class="plan-link-dot" style="background: var(--paloma);"></span>
+            <span class="plan-link-name">Paloma Valencia & Juan Daniel Oviedo</span>
+            <span class="plan-link-cta">
+              Leer el plan
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </span>
+          </a>
+          <a class="plan-link" href="https://drive.google.com/file/d/1JH8zTarrfysSyknMaW6H-aVIa-mVf7pJ/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <span class="plan-link-dot" style="background: var(--cepeda);"></span>
+            <span class="plan-link-name">Iván Cepeda</span>
+            <span class="plan-link-cta">
+              Leer el plan
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="btn btn-ghost" onclick="tcRestart()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          Hacer de nuevo
+        </button>
+        <button class="btn" onclick="tcShowRecap()">
+          Ver mi recorrido
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === RECAP === -->
+  <div id="screen-recap" class="screen hidden">
+    <div class="card">
+      <div class="print-only print-header">
+        <span class="print-header-flag"></span>
+        <span class="print-header-title">Brújula Electoral · Colombia 2026</span>
+        <div class="print-header-meta">Test de afinidad política · Ejercicio educativo basado en planes de gobierno oficiales</div>
+      </div>
+
+      <div class="print-only print-result-summary" id="tc-print-summary">
+        <!-- Inyectado dinámicamente -->
+      </div>
+
+      <div class="recap-intro">
+        <div class="eyebrow">Recorrido detallado</div>
+        <h2 class="recap-title">Tus respuestas por bloque</h2>
+        <p class="recap-subtitle">Cada respuesta, su intensidad y el eje al que aportó.</p>
+      </div>
+      <div id="tc-recap-list"></div>
+
+      <div class="print-only print-footer">
+        Generado por Brújula Electoral · Test de afinidad política Colombia 2026 · Documento generado el <span id="tc-print-date"></span>
+      </div>
+
+      <div class="nav recap-nav">
+        <button class="btn btn-ghost" onclick="tcShowResult()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Volver al resultado
+        </button>
+        <div class="recap-nav-right">
+          <button class="btn btn-ghost" onclick="tcRestart()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            Hacer de nuevo
+          </button>
+          <button class="btn" onclick="tcExportPDF()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Exportar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span class="footer-flag"></span>
+  Brújula Electoral · Elecciones Colombia 2026 · Ejercicio educativo basado en planes de gobierno oficiales
+</div>
+
+<script>
+  // === Configuración de ejes y candidatos ===
+  const EJES = ["economico", "seguridad", "ambiental", "paz", "reformas"];
+
+  const EJES_INFO = {
+    economico: { nombre: "Económico", icon: "💰", left: "Estado activo", right: "Mercado libre", color: "#1d4ed8" },
+    seguridad: { nombre: "Seguridad", icon: "🛡️", left: "Política social", right: "Mano dura", color: "#c2410c" },
+    ambiental: { nombre: "Ambiental", icon: "🌱", left: "Transición", right: "Extractivismo", color: "#047857" },
+    paz: { nombre: "Paz", icon: "🕊️", left: "Negociación", right: "Confrontación", color: "#7c3aed" },
+    reformas: { nombre: "Reformas", icon: "🔄", left: "Continuidad", right: "Ruptura", color: "#db2777" }
+  };
+
+  // Posiciones de candidatos en cada eje, escala -10 a +10
+  // Izquierda (-) = Estado/social/transición/negociación/continuidad
+  // Derecha (+) = Mercado/dura/extractivo/confrontación/ruptura
+  const CANDIDATOS = {
+    abelardo: {
+      nombre: "Abelardo De La Espriella",
+      nombreCorto: "Abelardo",
+      tagline: "Defensores de la Patria · Mano firme y reducción del Estado",
+      desc: "Propone una agenda de seguridad de confrontación directa contra el crimen organizado, reducción significativa del tamaño del Estado, libre mercado con menos impuestos y regulación, y defensa de las instituciones tradicionales como núcleo del orden social.",
+      pos: { economico: 9, seguridad: 9, ambiental: 5, paz: -9, reformas: 9 },
+      color: "var(--abelardo)",
+      colorHex: "#c2410c",
+      bg: "var(--abelardo-bg)"
+    },
+    paloma: {
+      nombre: "Paloma Valencia & Juan Daniel Oviedo",
+      nombreCorto: "Paloma",
+      tagline: "Colombia Más Grande · Reforma gerencial con tecnología",
+      desc: "Propone modernizar el Estado con tecnología, recuperar la confianza inversionista, reducir el déficit fiscal con disciplina, fortalecer la Fuerza Pública con un Plan 30-30 y combinar inversión pública con incentivos al sector privado.",
+      pos: { economico: 6, seguridad: 6, ambiental: 8, paz: -4, reformas: 4 },
+      color: "var(--paloma)",
+      colorHex: "#1d4ed8",
+      bg: "var(--paloma-bg)"
+    },
+    cepeda: {
+      nombre: "Iván Cepeda",
+      nombreCorto: "Cepeda",
+      tagline: "El Poder de la Verdad · Continuidad y profundización del cambio",
+      desc: "Propone una segunda fase del gobierno Petro centrada en revolución agraria, seguridad humana basada en política social, implementación plena del Acuerdo de Paz de 2016, transición energética sin fracking y una política contra la macrocorrupción como sistema.",
+      pos: { economico: -8, seguridad: -8, ambiental: -9, paz: 9, reformas: -9 },
+      color: "var(--cepeda)",
+      colorHex: "#047857",
+      bg: "var(--cepeda-bg)"
+    }
+  };
+
+  // === 30 preguntas calibradas ===
+  // direction: +1 significa "de acuerdo" empuja hacia derecha del eje (+)
+  //            -1 significa "de acuerdo" empuja hacia izquierda del eje (-)
+  // intensity: peso (1 = moderada, 2 = extrema)
+  const PREGUNTAS = [
+    // === BLOQUE 1: Económico ===
+    { id: "q1", tipo: "likert", bloque: "economico", eje: "economico", direction: +1, intensity: 2,
+      texto: "El Estado colombiano hoy es demasiado grande y debería reducirse en al menos una cuarta parte." },
+    { id: "q2", tipo: "likert", bloque: "economico", eje: "economico", direction: +1, intensity: 1,
+      texto: "Reducir el impuesto a las empresas es la mejor forma de generar empleo en el país." },
+    { id: "q3", tipo: "likert", bloque: "economico", eje: "economico", direction: -1, intensity: 2,
+      texto: "El gobierno debería aumentar los impuestos a los más ricos para financiar programas sociales." },
+    { id: "q4", tipo: "likert", bloque: "economico", eje: "economico", direction: +1, intensity: 1,
+      texto: "La economía crece más cuando hay menos trámites y regulaciones para los empresarios." },
+    { id: "q5", tipo: "likert", bloque: "economico", eje: "economico", direction: -1, intensity: 1,
+      texto: "Los subsidios y transferencias del Estado a las familias pobres deben ampliarse, no recortarse." },
+
+    // === BLOQUE 2: Seguridad ===
+    { id: "q6", tipo: "likert", bloque: "seguridad", eje: "seguridad", direction: -1, intensity: 2,
+      texto: "La principal causa de la inseguridad en Colombia es la pobreza y la desigualdad, no la falta de fuerza pública." },
+    { id: "q7", tipo: "likert", bloque: "seguridad", eje: "seguridad", direction: +1, intensity: 1,
+      texto: "Hay que aumentar significativamente el pie de fuerza militar y policial del país." },
+    { id: "q8", tipo: "likert", bloque: "seguridad", eje: "seguridad", direction: -1, intensity: 2,
+      texto: "Sin garantías de derechos humanos en los operativos, ninguna estrategia de seguridad es legítima." },
+    { id: "q9", tipo: "likert", bloque: "seguridad", eje: "seguridad", direction: +1, intensity: 2,
+      texto: "Frente a la extorsión y el crimen organizado, los resultados rápidos son más importantes que el debido proceso." },
+    { id: "q10", tipo: "likert", bloque: "seguridad", eje: "seguridad", direction: -1, intensity: 1,
+      texto: "Invertir en oportunidades para los jóvenes en zonas de riesgo previene más crímenes que aumentar la policía." },
+
+    // === BLOQUE 3: Ambiental ===
+    { id: "q11", tipo: "likert", bloque: "ambiental", eje: "ambiental", direction: +1, intensity: 2,
+      texto: "Colombia debe aprovechar al máximo sus reservas de petróleo, gas y carbón mientras los tenga." },
+    { id: "q12", tipo: "likert", bloque: "ambiental", eje: "ambiental", direction: +1, intensity: 1,
+      texto: "El fracking es una tecnología legítima si se aplica con regulación ambiental seria." },
+    { id: "q13", tipo: "likert", bloque: "ambiental", eje: "ambiental", direction: -1, intensity: 2,
+      texto: "Vale la pena renunciar a ingresos petroleros para acelerar la transición a energías renovables." },
+    { id: "q14", tipo: "likert", bloque: "ambiental", eje: "ambiental", direction: +1, intensity: 1,
+      texto: "La consulta previa a comunidades indígenas y afro no debería poder vetar proyectos de inversión nacional." },
+    { id: "q15", tipo: "likert", bloque: "ambiental", eje: "ambiental", direction: -1, intensity: 1,
+      texto: "La protección de los bosques y los ríos debe estar por encima del beneficio económico de proyectos mineros o energéticos." },
+
+    // === BLOQUE 4: Paz ===
+    { id: "q16", tipo: "likert", bloque: "paz", eje: "paz", direction: -1, intensity: 2,
+      texto: "Con los grupos armados ilegales no se negocia: se les derrota militarmente." },
+    { id: "q17", tipo: "likert", bloque: "paz", eje: "paz", direction: -1, intensity: 1,
+      texto: "La política de Paz Total del gobierno actual ha sido un error." },
+    { id: "q18", tipo: "likert", bloque: "paz", eje: "paz", direction: +1, intensity: 2,
+      texto: "El Acuerdo de Paz de 2016 debe implementarse en su totalidad, incluso si toma cuatro años más de lo previsto." },
+    { id: "q19", tipo: "likert", bloque: "paz", eje: "paz", direction: +1, intensity: 1,
+      texto: "Los líderes sociales y firmantes de paz asesinados son consecuencia de fallas del Estado que deben repararse urgentemente." },
+    { id: "q20", tipo: "likert", bloque: "paz", eje: "paz", direction: +1, intensity: 1,
+      texto: "Los exguerrilleros que cumplieron con la justicia transicional tienen derecho a hacer política y ocupar cargos públicos." },
+
+    // === BLOQUE 5: Reformas ===
+    { id: "q21", tipo: "likert", bloque: "reformas", eje: "reformas", direction: +1, intensity: 2,
+      texto: "El próximo gobierno debe revertir las principales reformas hechas en los últimos cuatro años." },
+    { id: "q22", tipo: "likert", bloque: "reformas", eje: "reformas", direction: -1, intensity: 2,
+      texto: "La reforma agraria que entrega tierra a los campesinos es uno de los avances más importantes de los últimos años." },
+    { id: "q23", tipo: "likert", bloque: "reformas", eje: "reformas", direction: +1, intensity: 1,
+      texto: "El modelo de salud con EPS funciona y solo necesita ajustes administrativos, no una reforma estructural." },
+    { id: "q24", tipo: "likert", bloque: "reformas", eje: "reformas", direction: -1, intensity: 1,
+      texto: "Las mujeres todavía enfrentan un sistema patriarcal que requiere medidas estructurales, no solo más juzgados." },
+    { id: "q25", tipo: "likert", bloque: "reformas", eje: "reformas", direction: +1, intensity: 1,
+      texto: "Colombia necesita una nueva Constituyente para refundar el país." },
+
+    // === BLOQUE 6: Prioridades ===
+    { id: "q26", tipo: "choice", bloque: "prioridades",
+      texto: "De estos cuatro grupos sociales, ¿a cuál crees que el próximo gobierno debería darle prioridad?",
+      opciones: [
+        { texto: "Las víctimas del conflicto armado", impacto: { paz: -2, reformas: -1 } },
+        { texto: "Las familias trabajadoras de clase media", impacto: { economico: +1, reformas: +1 } },
+        { texto: "Los empresarios y generadores de empleo", impacto: { economico: +2, reformas: +1 } },
+        { texto: "Los campesinos y comunidades rurales", impacto: { economico: -1, reformas: -2 } }
+      ]
+    },
+    { id: "q27", tipo: "choice", bloque: "prioridades",
+      texto: "¿Cuál de estos cuatro problemas debería ser la prioridad #1 del próximo gobierno?",
+      opciones: [
+        { texto: "Recuperar el orden público y derrotar al crimen organizado", impacto: { seguridad: +2, paz: -2 } },
+        { texto: "Estabilizar la economía y atraer inversión", impacto: { economico: +2, reformas: +1 } },
+        { texto: "Reducir la pobreza y la desigualdad", impacto: { economico: -2, seguridad: -1 } },
+        { texto: "Implementar la paz y proteger líderes sociales", impacto: { paz: +2, reformas: -1 } }
+      ]
+    },
+    { id: "q28", tipo: "choice", bloque: "prioridades",
+      texto: "Si tuvieras que escoger una sola palabra que describe lo que Colombia más necesita ahora mismo:",
+      opciones: [
+        { texto: "Orden", impacto: { seguridad: +2, paz: -1, reformas: +1 } },
+        { texto: "Eficiencia", impacto: { economico: +1, reformas: +1 } },
+        { texto: "Justicia", impacto: { economico: -2, reformas: -1 } },
+        { texto: "Reconciliación", impacto: { paz: +2, reformas: -1 } }
+      ]
+    },
+
+    // === BLOQUE 7: Trade-offs ===
+    { id: "q29", tipo: "tradeoff", bloque: "tradeoffs",
+      texto: "Si tuvieras que renunciar a uno, ¿a cuál renunciarías?",
+      opciones: [
+        { texto: "A que la economía crezca rápido, a cambio de que la desigualdad disminuya", impacto: { economico: -3 } },
+        { texto: "A que la desigualdad disminuya, a cambio de que la economía crezca rápido", impacto: { economico: +3 } }
+      ]
+    },
+    { id: "q30", tipo: "tradeoff", bloque: "tradeoffs",
+      texto: "En un caso real donde la fuerza pública tuviera que escoger:",
+      opciones: [
+        { texto: "Capturar a un narcotraficante importante, incluso si eso causa daños colaterales en la comunidad", impacto: { seguridad: +3, paz: -2 } },
+        { texto: "Proteger a la comunidad, incluso si eso significa que el narcotraficante escape esta vez", impacto: { seguridad: -3, paz: +2 } }
+      ]
+    }
+  ];
+
+  // === Bloques (para transiciones) ===
+  const BLOQUES = [
+    { id: "economico", titulo: "Eje económico", icon: "💰", desc: "Vamos a medir tu posición sobre el papel del Estado en la economía. Cinco preguntas en escala de 5 puntos.", num: "BLOQUE 1 DE 7" },
+    { id: "seguridad", titulo: "Eje de seguridad", icon: "🛡️", desc: "Ahora exploramos qué piensas sobre cómo enfrentar la inseguridad. Cinco preguntas más.", num: "BLOQUE 2 DE 7" },
+    { id: "ambiental", titulo: "Eje ambiental", icon: "🌱", desc: "Tus posiciones sobre energía, recursos naturales y medio ambiente. Cinco preguntas más.", num: "BLOQUE 3 DE 7" },
+    { id: "paz", titulo: "Eje de paz", icon: "🕊️", desc: "Tu visión sobre el conflicto armado y los procesos de paz. Cinco preguntas más.", num: "BLOQUE 4 DE 7" },
+    { id: "reformas", titulo: "Eje de reformas", icon: "🔄", desc: "Qué tan profundo crees que debe ser el cambio. Cinco preguntas más.", num: "BLOQUE 5 DE 7" },
+    { id: "prioridades", titulo: "Tus prioridades", icon: "🎯", desc: "Tres preguntas para identificar qué temas pesan más en tu visión del país.", num: "BLOQUE 6 DE 7" },
+    { id: "tradeoffs", titulo: "Decisiones difíciles", icon: "⚖️", desc: "Dos preguntas donde tienes que escoger entre dos valores buenos. Las más reveladoras del test.", num: "BLOQUE 7 DE 7" }
+  ];
+
+  let TC_STATE = {
+    current: 0,
+    respuestas: {},
+    bloquePresentado: null
+  };
+
+  function tcStart() {
+    document.getElementById("screen-intro").classList.add("hidden");
+    tcShowTransition(0);
+  }
+
+  function tcShowTransition(qIdx) {
+    const p = PREGUNTAS[qIdx];
+    const bloque = BLOQUES.find(b => b.id === p.bloque);
+
+    document.getElementById("tr-icon").textContent = bloque.icon;
+    document.getElementById("tr-num").textContent = bloque.num;
+    document.getElementById("tr-title").textContent = bloque.titulo;
+    document.getElementById("tr-desc").textContent = bloque.desc;
+
+    document.getElementById("screen-quiz").classList.add("hidden");
+    document.getElementById("screen-transition").classList.remove("hidden");
+    TC_STATE.bloquePresentado = bloque.id;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function tcContinueFromTransition() {
+    document.getElementById("screen-transition").classList.add("hidden");
+    document.getElementById("screen-quiz").classList.remove("hidden");
+    tcRender();
+  }
+
+  function tcRenderProgressBar() {
+    const bar = document.getElementById("tc-progress-bar");
+    bar.innerHTML = "";
+    PREGUNTAS.forEach((p, i) => {
+      const seg = document.createElement("div");
+      seg.className = "progress-segment";
+      if (i < TC_STATE.current) seg.classList.add("done");
+      if (i === TC_STATE.current) seg.classList.add("current");
+      seg.style.flex = "1";
+      seg.style.background = EJES_INFO[p.eje || p.bloque]?.color || "var(--ink)";
+      bar.appendChild(seg);
+    });
+  }
+
+  function tcRender() {
+    const p = PREGUNTAS[TC_STATE.current];
+    const total = PREGUNTAS.length;
+    const bloque = BLOQUES.find(b => b.id === p.bloque);
+
+    document.getElementById("tc-counter").textContent = `Pregunta ${TC_STATE.current + 1} de ${total}`;
+    document.getElementById("tc-block-name").textContent = bloque.titulo.replace("Eje ", "").replace("Eje de ", "");
+    const blockDot = document.querySelector("#tc-block-tag .block-dot");
+    blockDot.style.background = EJES_INFO[p.eje || p.bloque]?.color || "var(--ink)";
+
+    tcRenderProgressBar();
+
+    document.getElementById("tc-question").textContent = p.texto;
+
+    const hint = document.getElementById("tc-hint");
+    if (p.tipo === "likert") hint.textContent = "Marca qué tan de acuerdo estás. El tamaño del círculo refleja la intensidad.";
+    else if (p.tipo === "choice") hint.textContent = "Escoge la opción que mejor refleje tu prioridad.";
+    else if (p.tipo === "tradeoff") hint.textContent = "Tienes que escoger una. No hay opción intermedia.";
+
+    const cont = document.getElementById("tc-options");
+    cont.innerHTML = "";
+    const seleccion = TC_STATE.respuestas[p.id];
+
+    if (p.tipo === "likert") {
+      const labels = [
+        { val: -2, label: "Muy en desacuerdo", intensity: "Fuerte" },
+        { val: -1, label: "En desacuerdo", intensity: "Moderado" },
+        { val: 0, label: "Neutral / No estoy seguro", intensity: "Neutro" },
+        { val: 1, label: "De acuerdo", intensity: "Moderado" },
+        { val: 2, label: "Muy de acuerdo", intensity: "Fuerte" }
+      ];
+      const wrap = document.createElement("div");
+      wrap.className = "likert";
+      labels.forEach(l => {
+        const btn = document.createElement("button");
+        btn.className = "likert-option";
+        btn.dataset.val = l.val;
+        if (seleccion === l.val) btn.classList.add("selected");
+        btn.innerHTML = `
+          <div class="likert-dot"></div>
+          <div class="likert-label">${l.label}</div>
+          <div class="likert-intensity">${l.intensity}</div>
+        `;
+        btn.onclick = () => tcSelectLikert(l.val);
+        wrap.appendChild(btn);
+      });
+      cont.appendChild(wrap);
+    } else if (p.tipo === "choice") {
+      const wrap = document.createElement("div");
+      wrap.className = "choices";
+      p.opciones.forEach((op, i) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.textContent = op.texto;
+        if (seleccion === i) btn.classList.add("selected");
+        btn.onclick = () => tcSelectChoice(i);
+        wrap.appendChild(btn);
+      });
+      cont.appendChild(wrap);
+    } else if (p.tipo === "tradeoff") {
+      const wrap = document.createElement("div");
+      wrap.className = "tradeoff";
+
+      const a = document.createElement("button");
+      a.className = "tradeoff-card";
+      a.innerHTML = `<div class="tradeoff-check"></div><div>${p.opciones[0].texto}</div>`;
+      if (seleccion === 0) a.classList.add("selected");
+      a.onclick = () => tcSelectChoice(0);
+      wrap.appendChild(a);
+
+      const vs = document.createElement("div");
+      vs.className = "tradeoff-vs";
+      vs.textContent = "vs";
+      wrap.appendChild(vs);
+
+      const b = document.createElement("button");
+      b.className = "tradeoff-card";
+      b.innerHTML = `<div class="tradeoff-check"></div><div>${p.opciones[1].texto}</div>`;
+      if (seleccion === 1) b.classList.add("selected");
+      b.onclick = () => tcSelectChoice(1);
+      wrap.appendChild(b);
+
+      cont.appendChild(wrap);
+    }
+
+    document.getElementById("tc-back").disabled = TC_STATE.current === 0;
+    const nextBtn = document.getElementById("tc-next");
+    nextBtn.disabled = seleccion === undefined;
+
+    const isLast = TC_STATE.current === total - 1;
+    nextBtn.innerHTML = isLast
+      ? `Ver resultado <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`
+      : `Siguiente <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+  }
+
+  function tcSelectLikert(val) {
+    const p = PREGUNTAS[TC_STATE.current];
+    TC_STATE.respuestas[p.id] = val;
+    tcRender();
+  }
+
+  function tcSelectChoice(idx) {
+    const p = PREGUNTAS[TC_STATE.current];
+    TC_STATE.respuestas[p.id] = idx;
+    tcRender();
+  }
+
+  function tcBack() {
+    if (TC_STATE.current > 0) {
+      TC_STATE.current--;
+      const p = PREGUNTAS[TC_STATE.current];
+      // Si el bloque cambia, mostrar pantalla de transición
+      const bloqueAnt = TC_STATE.current > 0 ? PREGUNTAS[TC_STATE.current - 1]?.bloque : null;
+      tcRender();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function tcNext() {
+    const total = PREGUNTAS.length;
+    if (TC_STATE.current < total - 1) {
+      const bloqueActual = PREGUNTAS[TC_STATE.current].bloque;
+      TC_STATE.current++;
+      const bloqueNuevo = PREGUNTAS[TC_STATE.current].bloque;
+      if (bloqueActual !== bloqueNuevo) {
+        tcShowTransition(TC_STATE.current);
+      } else {
+        tcRender();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      tcShowResult();
+    }
+  }
+
+  function tcCalcular() {
+    const posUsuario = { economico: 0, seguridad: 0, ambiental: 0, paz: 0, reformas: 0 };
+    const aportes = {};
+
+    PREGUNTAS.forEach(p => {
+      const r = TC_STATE.respuestas[p.id];
+      if (r === undefined) return;
+
+      if (p.tipo === "likert") {
+        // r es -2 a +2. direction es +1 o -1. intensity es 1 o 2.
+        const contribucion = r * p.direction * p.intensity;
+        posUsuario[p.eje] += contribucion;
+        aportes[p.id] = { eje: p.eje, aporte: contribucion };
+      } else if (p.tipo === "choice" || p.tipo === "tradeoff") {
+        const impacto = p.opciones[r].impacto;
+        const aportesArr = [];
+        Object.entries(impacto).forEach(([eje, val]) => {
+          posUsuario[eje] += val;
+          aportesArr.push({ eje, aporte: val });
+        });
+        aportes[p.id] = aportesArr;
+      }
+    });
+
+    // Normalizar a escala -10 a +10
+    // Likert máximo por eje: 5 preguntas × (2 intensidad max × 2 direction × 2 valor max) = 5 × 4 = 20 si todas extremas
+    // En la práctica usamos valores 1 y 2. Suma máxima teórica: 2*2 + 1*2 + 2*2 + 1*2 + 1*2 = 16 (eje economico)
+    // Para normalizar, dividimos por el máximo teórico de cada eje
+    const maximosTeoricos = {};
+    EJES.forEach(eje => {
+      let maxLikert = 0;
+      PREGUNTAS.filter(p => p.tipo === "likert" && p.eje === eje).forEach(p => {
+        maxLikert += 2 * p.intensity; // valor max (2) * intensity
+      });
+      let maxChoice = 0;
+      PREGUNTAS.filter(p => p.tipo === "choice" || p.tipo === "tradeoff").forEach(p => {
+        let maxImpactoEje = 0;
+        p.opciones.forEach(op => {
+          const imp = op.impacto[eje];
+          if (imp !== undefined) maxImpactoEje = Math.max(maxImpactoEje, Math.abs(imp));
+        });
+        maxChoice += maxImpactoEje;
+      });
+      maximosTeoricos[eje] = maxLikert + maxChoice;
+    });
+
+    const posNormalizada = {};
+    EJES.forEach(eje => {
+      posNormalizada[eje] = maximosTeoricos[eje] > 0
+        ? (posUsuario[eje] / maximosTeoricos[eje]) * 10
+        : 0;
+    });
+
+    // Calcular distancia euclidiana al candidato
+    const distancias = {};
+    Object.entries(CANDIDATOS).forEach(([key, c]) => {
+      let dist = 0;
+      EJES.forEach(eje => {
+        const diff = posNormalizada[eje] - c.pos[eje];
+        dist += diff * diff;
+      });
+      distancias[key] = Math.sqrt(dist);
+    });
+
+    // Convertir distancias a porcentajes de afinidad
+    // distancia máxima teórica = sqrt(5 * 20^2) = sqrt(2000) ~ 44.7
+    const maxDist = Math.sqrt(5 * 400);
+    const afinidades = {};
+    let sumaAfin = 0;
+    Object.entries(distancias).forEach(([key, d]) => {
+      const afin = Math.max(0, 1 - d / maxDist);
+      afinidades[key] = afin;
+      sumaAfin += afin;
+    });
+    // Normalizar a porcentajes que suman 100
+    const afinPct = {};
+    Object.entries(afinidades).forEach(([key, a]) => {
+      afinPct[key] = sumaAfin > 0 ? (a / sumaAfin) * 100 : 33.33;
+    });
+
+    return { posNormalizada, distancias, afinidades, afinPct, aportes };
+  }
+
+  function tcShowResult() {
+    document.getElementById("screen-quiz").classList.add("hidden");
+    document.getElementById("screen-recap").classList.add("hidden");
+    document.getElementById("screen-result").classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const { posNormalizada, afinPct } = tcCalcular();
+
+    // Sort by afinidad
+    const sorted = Object.entries(afinPct).sort((a, b) => b[1] - a[1]);
+    const ganador = sorted[0][0];
+    const c = CANDIDATOS[ganador];
+
+    document.getElementById("tc-result-name").textContent = c.nombre;
+    document.getElementById("tc-result-tagline").textContent = c.tagline;
+    document.getElementById("tc-result-desc").textContent = c.desc;
+
+    // Razón principal: encontrar el eje donde el usuario está más cerca del candidato
+    const distPorEje = EJES.map(eje => ({
+      eje,
+      dist: Math.abs(posNormalizada[eje] - c.pos[eje])
+    })).sort((a, b) => a.dist - b.dist);
+
+    const ejeCercano = distPorEje[0].eje;
+    const ejeLejano = distPorEje[distPorEje.length - 1].eje;
+    const candLejano = sorted[sorted.length - 1][0];
+
+    const userPosLabel = (val) => {
+      if (val < -5) return "claramente";
+      if (val < -2) return "moderadamente";
+      if (val < 2) return "ligeramente";
+      if (val < 5) return "moderadamente";
+      return "claramente";
+    };
+
+    const ejeCercanoInfo = EJES_INFO[ejeCercano];
+    const dirEjeCercano = posNormalizada[ejeCercano] < 0 ? ejeCercanoInfo.left.toLowerCase() : ejeCercanoInfo.right.toLowerCase();
+    const intensidadEjeCercano = userPosLabel(posNormalizada[ejeCercano]);
+
+    document.getElementById("tc-result-reason").innerHTML =
+      `<strong>Tu mayor coincidencia con ${c.nombreCorto}</strong> está en el <strong>eje ${ejeCercanoInfo.nombre.toLowerCase()}</strong>: tú estás ${intensidadEjeCercano} del lado de "${dirEjeCercano}", y ${c.nombreCorto} también. Tu mayor distancia con ${CANDIDATOS[candLejano].nombreCorto} está en el eje <strong>${EJES_INFO[ejeLejano].nombre.toLowerCase()}</strong>.`;
+
+    // Bars
+    const barsCont = document.getElementById("tc-result-bars");
+    barsCont.innerHTML = "";
+    sorted.forEach(([key, pct]) => {
+      const cand = CANDIDATOS[key];
+      const bar = document.createElement("div");
+      bar.className = "bar";
+      bar.innerHTML = `
+        <div class="bar-label">
+          <span class="bar-name">${cand.nombreCorto}</span>
+          <span class="bar-value">${Math.round(pct)}% de afinidad</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: 0%; background: ${cand.color};"></div>
+        </div>
+      `;
+      barsCont.appendChild(bar);
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          bar.querySelector(".bar-fill").style.width = `${pct}%`;
+        }, 100 + Math.random() * 200);
+      });
+    });
+
+    // Compass (eje por eje)
+    const compassCont = document.getElementById("tc-compass");
+    compassCont.innerHTML = "";
+    EJES.forEach(eje => {
+      const info = EJES_INFO[eje];
+      const userPos = posNormalizada[eje]; // -10 a +10
+      const userPct = ((userPos + 10) / 20) * 100; // 0 a 100
+
+      const row = document.createElement("div");
+      row.className = "compass-row";
+      row.innerHTML = `
+        <div class="compass-label-l">${info.left}</div>
+        <div class="compass-track" id="track-${eje}">
+          <div class="compass-cand compass-cand-a" style="left: ${((CANDIDATOS.abelardo.pos[eje] + 10) / 20) * 100}%;" title="Abelardo"></div>
+          <div class="compass-cand compass-cand-p" style="left: ${((CANDIDATOS.paloma.pos[eje] + 10) / 20) * 100}%;" title="Paloma"></div>
+          <div class="compass-cand compass-cand-c" style="left: ${((CANDIDATOS.cepeda.pos[eje] + 10) / 20) * 100}%;" title="Cepeda"></div>
+          <div class="compass-user" style="left: 50%;" data-target="${userPct}"></div>
+        </div>
+        <div class="compass-label-r">${info.right}</div>
+      `;
+      compassCont.appendChild(row);
+
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const userMark = row.querySelector(".compass-user");
+          userMark.style.left = `${userPct}%`;
+        }, 200);
+      });
+    });
+  }
+
+  function tcShowRecap() {
+    document.getElementById("screen-result").classList.add("hidden");
+    document.getElementById("screen-recap").classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const lista = document.getElementById("tc-recap-list");
+    lista.innerHTML = "";
+
+    BLOQUES.forEach(bloque => {
+      const preguntasBloque = PREGUNTAS.filter(p => p.bloque === bloque.id);
+      const blockDiv = document.createElement("div");
+      blockDiv.className = "recap-block";
+
+      const header = document.createElement("div");
+      header.className = "recap-block-header";
+      const ejeColor = EJES_INFO[bloque.id]?.color || "var(--ink)";
+      header.innerHTML = `
+        <div class="recap-block-icon" style="background: ${ejeColor};"></div>
+        <div class="recap-block-title">${bloque.icon} ${bloque.titulo}</div>
+      `;
+      blockDiv.appendChild(header);
+
+      preguntasBloque.forEach(p => {
+        const r = TC_STATE.respuestas[p.id];
+        const item = document.createElement("div");
+        item.className = "recap-item";
+
+        if (r === undefined) {
+          item.innerHTML = `
+            <p class="recap-q">${p.texto}</p>
+            <p class="recap-a"><span class="recap-a-label">No respondiste</span></p>
+          `;
+        } else if (p.tipo === "likert") {
+          const labels = { "-2": "Muy en desacuerdo", "-1": "En desacuerdo", "0": "Neutral", "1": "De acuerdo", "2": "Muy de acuerdo" };
+          item.innerHTML = `
+            <p class="recap-q">${p.texto}</p>
+            <p class="recap-a">
+              <span class="recap-a-label">${labels[r]}</span>
+              <span class="recap-a-intensity">Eje ${EJES_INFO[p.eje].nombre.toLowerCase()}</span>
+            </p>
+          `;
+        } else {
+          item.innerHTML = `
+            <p class="recap-q">${p.texto}</p>
+            <p class="recap-a"><span class="recap-a-label">"${p.opciones[r].texto}"</span></p>
+          `;
+        }
+        blockDiv.appendChild(item);
+      });
+
+      lista.appendChild(blockDiv);
+    });
+  }
+
+  function tcExportPDF() {
+    // Calcular resultado para incluirlo en el resumen impreso
+    const { posNormalizada, afinPct } = tcCalcular();
+    const sorted = Object.entries(afinPct).sort((a, b) => b[1] - a[1]);
+    const ganador = sorted[0][0];
+    const c = CANDIDATOS[ganador];
+
+    // Construir el resumen del resultado para la versión impresa
+    const summary = document.getElementById("tc-print-summary");
+    let affinityRows = "";
+    sorted.forEach(([key, pct]) => {
+      const cand = CANDIDATOS[key];
+      affinityRows += `<div class="print-affinity-row"><span>${cand.nombre}</span><span><strong>${Math.round(pct)}%</strong> de afinidad</span></div>`;
+    });
+
+    // Encontrar eje de mayor coincidencia
+    const distPorEje = EJES.map(eje => ({
+      eje,
+      dist: Math.abs(posNormalizada[eje] - c.pos[eje])
+    })).sort((a, b) => a.dist - b.dist);
+    const ejeCercano = distPorEje[0].eje;
+    const ejeCercanoInfo = EJES_INFO[ejeCercano];
+
+    summary.innerHTML = `
+      <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 4px;">Tu candidato afín</div>
+      <h2>${c.nombre}</h2>
+      <div class="print-tagline">${c.tagline}</div>
+      <div style="font-size: 11px; color: #444; line-height: 1.5; margin-bottom: 12px;">${c.desc}</div>
+      <div style="font-size: 11px; color: #444; line-height: 1.5; margin-bottom: 12px; padding: 8px 10px; background: #ffffff; border-left: 2px solid #fcd116;">
+        <strong>Mayor coincidencia:</strong> eje ${ejeCercanoInfo.nombre.toLowerCase()}.
+      </div>
+      <div class="print-affinities">
+        ${affinityRows}
+      </div>
+    `;
+
+    // Fecha actual en formato legible
+    const now = new Date();
+    const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+    const fechaStr = `${now.getDate()} de ${meses[now.getMonth()]} de ${now.getFullYear()}`;
+    document.getElementById("tc-print-date").textContent = fechaStr;
+
+    // Cambiar título del documento temporalmente para que sea el nombre del PDF sugerido
+    const tituloOriginal = document.title;
+    document.title = `Brujula-Electoral-Mi-Resultado-${now.getFullYear()}`;
+
+    // Disparar diálogo de impresión (el usuario elige "Guardar como PDF")
+    window.print();
+
+    // Restaurar título después de un momento
+    setTimeout(() => {
+      document.title = tituloOriginal;
+    }, 1000);
+  }
+
+  function tcRestart() {
+    TC_STATE = { current: 0, respuestas: {}, bloquePresentado: null };
+    document.getElementById("screen-result").classList.add("hidden");
+    document.getElementById("screen-recap").classList.add("hidden");
+    document.getElementById("screen-quiz").classList.add("hidden");
+    document.getElementById("screen-transition").classList.add("hidden");
+    document.getElementById("screen-intro").classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
